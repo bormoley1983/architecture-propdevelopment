@@ -1,0 +1,23 @@
+@startuml smart-home-context
+!include <C4/C4_Context>
+
+title C4 Context — PropDevelopment Smart Home Services
+LAYOUT_LEFT_RIGHT()
+
+Person(owner, "Собственник", "Использует мобильное приложение для управления доступом к дому и парковке.")
+
+System(propdevelopment, "PropDevelopment — сервисы для собственников", "Мобильная витрина и backend-сервисы ЖКУ; проверяют личность, право на объект и полномочия пользователя.")
+System_Ext(smart_home_partner, "Платформа партнёра «Умный дом»", "Обрабатывает разрешённые команды, синхронизирует права доступа и управляет устройствами.")
+System_Ext(intercom, "Интеллектуальный домофон", "Осуществляет вызов и распознаёт лицо в рамках настроенных разрешений.")
+System_Ext(barrier, "Интеллектуальный шлагбаум", "Распознаёт номер автомобиля и открывает въезд при действующем разрешении.")
+
+Rel(owner, propdevelopment, "Использует приложение: вызов, управление доступом и просмотр статусов", "HTTPS")
+Rel(propdevelopment, smart_home_partner, "Передаёт минимальные разрешения и команды; запрашивает статус", "HTTPS API, mTLS + OAuth 2.0")
+Rel(smart_home_partner, propdevelopment, "Возвращает события и результаты команд", "Подписанный callback или инициируемый PropDevelopment polling")
+Rel(smart_home_partner, intercom, "Управляет устройством и передаёт разрешения", "API производителя")
+Rel(intercom, smart_home_partner, "Передаёт событие вызова и результат распознавания", "Протокол производителя")
+Rel(smart_home_partner, barrier, "Синхронизирует список разрешённых номеров и команды", "API производителя")
+Rel(barrier, smart_home_partner, "Передаёт событие распознавания и состояние устройства", "Протокол производителя")
+
+SHOW_LEGEND()
+@enduml
